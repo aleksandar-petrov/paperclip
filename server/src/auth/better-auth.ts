@@ -73,8 +73,10 @@ export function createBetterAuthInstance(db: Db, config: Config, trustedOrigins?
   const publicUrl = process.env.PAPERCLIP_PUBLIC_URL ?? baseUrl;
   const isHttpOnly = publicUrl ? publicUrl.startsWith("http://") : false;
 
+  const effectiveBaseUrl = baseUrl ?? publicUrl;
+
   const authConfig = {
-    baseURL: baseUrl,
+    baseURL: effectiveBaseUrl,
     secret,
     trustedOrigins: effectiveTrustedOrigins,
     database: drizzleAdapter(db, {
@@ -94,7 +96,7 @@ export function createBetterAuthInstance(db: Db, config: Config, trustedOrigins?
     ...(isHttpOnly ? { advanced: { useSecureCookies: false } } : {}),
   };
 
-  if (!baseUrl) {
+  if (!effectiveBaseUrl) {
     delete (authConfig as { baseURL?: string }).baseURL;
   }
 
